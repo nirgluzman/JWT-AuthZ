@@ -30,7 +30,7 @@ app.post("/token", (req, res) => {
   if (refreshToken == null) return res.sendStatus(401);
 
   // verify that refreshToken is valid.
-  if (!refreshToken.includes(refreshTokens)) return res.sendStatus(403);
+  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
 
   // confirm the validity of refreshToken.
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
@@ -53,6 +53,12 @@ app.post("/login", (req, res) => {
   refreshTokens.push(refreshToken);
 
   res.json({ accessToken, refreshToken });
+});
+
+// delete refreshToken once the user logout.
+app.delete("/logout", (req, res) => {
+  refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
+  res.sendStatus(204); // successfully deleted refreshToken
 });
 
 app.listen(PORT, () => {
